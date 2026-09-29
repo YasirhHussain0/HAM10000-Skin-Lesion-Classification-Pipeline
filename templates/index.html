@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plant Disease Detector</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 50%, #fff8e1 100%);
+      min-height: 100vh;
+      color: #1b4332;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+    }
+
+    header p {
+      color: #52796f;
+      font-size: 0.95rem;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(27, 67, 50, 0.08);
+      padding: 1.5rem;
+    }
+
+    .dropzone {
+      border: 2px dashed #95d5b2;
+      border-radius: 12px;
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      background: #f8fdf9;
+    }
+
+    .dropzone:hover, .dropzone.dragover {
+      border-color: #40916c;
+      background: #edf7f0;
+    }
+
+    .dropzone-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .dropzone p {
+      color: #52796f;
+      font-size: 0.9rem;
+    }
+
+    .dropzone strong {
+      color: #2d6a4f;
+    }
+
+    #fileInput { display: none; }
+
+    .preview {
+      display: none;
+      margin-top: 1.25rem;
+      text-align: center;
+    }
+
+    .preview.visible { display: block; }
+
+    .preview img {
+      max-width: 100%;
+      max-height: 240px;
+      border-radius: 10px;
+      object-fit: contain;
+      border: 1px solid #d8f3dc;
+    }
+
+    .preview .filename {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: #52796f;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      margin-top: 1.25rem;
+      padding: 0.85rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s;
+    }
+
+    .btn-primary {
+      background: #40916c;
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) { background: #2d6a4f; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .result {
+      display: none;
+      margin-top: 1.5rem;
+      padding: 1.25rem;
+      border-radius: 12px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .result.visible { display: block; }
+
+    .result.healthy {
+      background: #d8f3dc;
+      border: 1px solid #95d5b2;
+    }
+
+    .result.diseased {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+    }
+
+    .result.error {
+      background: #fde8e8;
+      border: 1px solid #f5c2c2;
+      color: #842029;
+    }
+
+    .result h2 {
+      font-size: 1.1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.4rem 0;
+      font-size: 0.95rem;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .result-row:last-child { border-bottom: none; }
+
+    .result-row span:first-child { color: #52796f; }
+    .result-row span:last-child { font-weight: 600; text-transform: capitalize; }
+
+    .confidence-bar {
+      margin-top: 0.75rem;
+      height: 8px;
+      background: rgba(0,0,0,0.08);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .confidence-fill {
+      height: 100%;
+      background: #40916c;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      margin-top: 1rem;
+      color: #52796f;
+      font-size: 0.9rem;
+    }
+
+    .loading.visible { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🌿 Plant Disease Detector</h1>
+      <p>Upload a leaf image to identify the plant and detect diseases</p>
+    </header>
+
+    <div class="card">
+      <div class="dropzone" id="dropzone">
+        <div class="dropzone-icon">📷</div>
+        <p><strong>Click to upload</strong> or drag & drop a leaf image</p>
+        <p style="margin-top:0.35rem;font-size:0.8rem;">JPG, PNG supported</p>
+      </div>
+      <input type="file" id="fileInput" accept="image/*">
+
+      <div class="preview" id="preview">
+        <img id="previewImg" alt="Preview">
+        <p class="filename" id="fileName"></p>
+      </div>
+
+      <button class="btn btn-primary" id="analyzeBtn" disabled>Analyze Leaf</button>
+
+      <div class="loading" id="loading">Analyzing image…</div>
+
+      <div class="result" id="result"></div>
+    </div>
+  </div>
+
+  <script>
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const preview = document.getElementById('preview');
+    const previewImg = document.getElementById('previewImg');
+    const fileName = document.getElementById('fileName');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const loading = document.getElementById('loading');
+    const result = document.getElementById('result');
+
+    let selectedFile = null;
+
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length) handleFile(fileInput.files[0]);
+    });
+
+    function handleFile(file) {
+      if (!file.type.startsWith('image/')) {
+        showError('Please select a valid image file.');
+        return;
+      }
+      selectedFile = file;
+      previewImg.src = URL.createObjectURL(file);
+      fileName.textContent = file.name;
+      preview.classList.add('visible');
+      analyzeBtn.disabled = false;
+      result.classList.remove('visible', 'healthy', 'diseased', 'error');
+    }
+
+    analyzeBtn.addEventListener('click', async () => {
+      if (!selectedFile) return;
+
+      analyzeBtn.disabled = true;
+      loading.classList.add('visible');
+      result.classList.remove('visible');
+
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      try {
+        const res = await fetch('/predict', { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (!res.ok) {
+          showError(data.error || 'Something went wrong.');
+          return;
+        }
+
+        showResult(data);
+      } catch {
+        showError('Could not reach the server. Is it running?');
+      } finally {
+        loading.classList.remove('visible');
+        analyzeBtn.disabled = false;
+      }
+    });
+
+    function showResult(data) {
+      const pct = (data.probability * 100).toFixed(1);
+      const isHealthy = data.is_healthy;
+
+      result.className = 'result visible ' + (isHealthy ? 'healthy' : 'diseased');
+      result.innerHTML = `
+        <h2>${isHealthy ? '✅ Healthy Leaf' : '⚠️ Disease Detected'}</h2>
+        <div class="result-row"><span>Plant</span><span>${data.plant}</span></div>
+        <div class="result-row"><span>Condition</span><span>${isHealthy ? 'Healthy' : data.disease}</span></div>
+        <div class="result-row"><span>Confidence</span><span>${pct}%</span></div>
+        <div class="confidence-bar"><div class="confidence-fill" style="width:${pct}%"></div></div>
+      `;
+    }
+
+    function showError(msg) {
+      result.className = 'result visible error';
+      result.innerHTML = `<h2>Error</h2><p>${msg}</p>`;
+    }
+  </script>
+</body>
+</html>
