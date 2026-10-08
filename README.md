@@ -1,13 +1,13 @@
-# Plant Disease Detector
+# Skin Lesion Classification
 
-A simple deep learning project that helps detect plant diseases from leaf images.
+A deep learning project for classifying skin lesions from medical images to support early detection and diagnosis.
 
-The app lets a user upload an image through a web interface, and the model predicts whether the leaf is healthy or diseased, along with the plant type and confidence score.
+The app lets a user upload an image through a web interface, and the model predicts the lesion type or condition along with a confidence score.
 
 ## What this project does
 
-- Classifies plant leaves into different disease categories
-- Detects whether a leaf is healthy or unhealthy
+- Classifies skin lesions into different categories
+- Detects suspicious or abnormal lesion patterns
 - Uses a trained deep learning model for prediction
 - Provides a user-friendly web interface for uploading images
 - Exposes an API endpoint for predictions
@@ -25,13 +25,13 @@ The app lets a user upload an image through a web interface, and the model predi
 ## Model and dataset
 
 - Model: MobileNetV2 with transfer learning
-- Dataset: New Plant Diseases Dataset
-- Output classes: 38 plant disease/health categories
+- Dataset: Skin lesion image dataset
+- Output classes: multiple lesion categories depending on training data
 
 ## Project structure
 
 ```text
-plant-disease-detector/
+skin-lesion-classification/
 ├── api.py
 ├── helpers.py
 ├── models.py
@@ -44,7 +44,7 @@ plant-disease-detector/
 ├── templates/
 │   └── index.html
 ├── README.md
-└── requirements.txt (if added later)
+└── requirements.txt
 ```
 
 ## How to run the project
@@ -71,18 +71,18 @@ http://127.0.0.1:5000/
 
 You will see a simple upload page where you can:
 
-1. Select an image of a leaf
-2. Click Analyze Leaf
+1. Select an image of a skin lesion
+2. Click Analyze Lesion
 3. View the prediction result
 
 ## How the web app works
 
-- The user uploads a plant image from the browser
+- The user uploads a skin lesion image from the browser
 - The Flask app receives the image
 - The model processes the image and predicts the class
 - The app returns:
-  - plant name
-  - disease status
+  - lesion label
+  - classification result
   - confidence score
 
 ## API endpoint
@@ -90,15 +90,14 @@ You will see a simple upload page where you can:
 You can also call the model directly through the Flask API:
 
 ```bash
-curl -X POST -F "file=@plant_image.jpg" http://127.0.0.1:5000/predict
+curl -X POST -F "file=@lesion_image.jpg" http://127.0.0.1:5000/predict
 ```
 
 This returns a JSON result such as:
 
 ```json
 {
-  "plant": "potato",
-  "disease": "early blight",
+  "label": "melanoma",
   "is_healthy": false,
   "probability": 0.98452
 }
@@ -106,13 +105,13 @@ This returns a JSON result such as:
 
 ## Notes
 
-This project is a practical application of computer vision and deep learning for agriculture. It can help farmers or researchers quickly identify disease symptoms from leaf images.
+This project is a practical application of computer vision and deep learning for medical image analysis. It can help clinicians or researchers quickly identify suspicious skin lesion patterns.
 
 ## Future improvements
 
-- Add more plant species and diseases
+- Add more lesion categories and datasets
 - Improve accuracy with additional training data
 - Add a better frontend design
 - Deploy the app online
-- Add image preprocessing improvements
+- Add image preprocessing and augmentation improvements
 

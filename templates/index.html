@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plant Disease Detector</title>
+  <title>Skin Lesion Classification</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -195,14 +195,14 @@
 <body>
   <div class="container">
     <header>
-      <h1>🌿 Plant Disease Detector</h1>
-      <p>Upload a leaf image to identify the plant and detect diseases</p>
+      <h1>🩺 Skin Lesion Classification</h1>
+      <p>Upload a skin lesion image to classify the condition</p>
     </header>
 
     <div class="card">
       <div class="dropzone" id="dropzone">
         <div class="dropzone-icon">📷</div>
-        <p><strong>Click to upload</strong> or drag & drop a leaf image</p>
+        <p><strong>Click to upload</strong> or drag & drop a skin lesion image</p>
         <p style="margin-top:0.35rem;font-size:0.8rem;">JPG, PNG supported</p>
       </div>
       <input type="file" id="fileInput" accept="image/*">
@@ -212,7 +212,7 @@
         <p class="filename" id="fileName"></p>
       </div>
 
-      <button class="btn btn-primary" id="analyzeBtn" disabled>Analyze Leaf</button>
+      <button class="btn btn-primary" id="analyzeBtn" disabled>Analyze Lesion</button>
 
       <div class="loading" id="loading">Analyzing image…</div>
 
